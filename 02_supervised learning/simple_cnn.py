@@ -72,10 +72,6 @@ if __name__ == "__main__":
     cnn_model.add(data_augmentation())                                  # rotate, shift and flip training images
     cnn_model.add(Conv2D(32, kernel_size=(3, 3), activation="relu"))
     cnn_model.add(MaxPooling2D(pool_size=(2, 2)))
-    cnn_model.add(Conv2D(64, kernel_size=(3, 3), activation="relu"))
-    cnn_model.add(MaxPooling2D(pool_size=(2, 2)))
-    cnn_model.add(Conv2D(128, kernel_size=(3, 3), activation="relu"))
-    cnn_model.add(MaxPooling2D(pool_size=(2, 2)))
     cnn_model.add(Conv2D(128, kernel_size=(3, 3), activation="relu"))
     cnn_model.add(MaxPooling2D(pool_size=(2, 2)))
     cnn_model.add(Flatten())
