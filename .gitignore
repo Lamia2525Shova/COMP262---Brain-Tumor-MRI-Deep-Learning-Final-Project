@@ -11,5 +11,5 @@ __pycache__/
 # KerasTuner trial folders (recreated by cnn_tuning.py)
 **/hyperband*/
 
-# ResNet50 models are 95-285 MB each (GitHub rejects files over 100 MB)
-04_pretrained_model_finetuning/results/**/*.keras
+# Trained models (10-285 MB; GitHub rejects files over 100 MB). Run the scripts to recreate them
+*.keras
