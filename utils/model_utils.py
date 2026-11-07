@@ -62,7 +62,15 @@ def data_augmentation():
 # ============================================================
 # Helper Functions for Visualizing
 # ============================================================
-def plot_training_history(history, metric, plot_title):
+def show_and_save(save_path=None):
+    """Save the current figure as a PNG (if a path is given), then display it."""
+    if save_path:
+        os.makedirs(os.path.dirname(save_path) or ".", exist_ok=True)
+        plt.savefig(save_path, dpi=150, bbox_inches="tight")
+    plt.show()
+
+
+def plot_training_history(history, metric, plot_title, save_path=None):
     """Plot a training vs validation metrics."""
     train, val = history.history[metric], history.history[f"val_{metric}"]
     epochs     = range(1, len(train) + 1)
@@ -83,10 +91,10 @@ def plot_training_history(history, metric, plot_title):
     plt.xticks(epochs)
     plt.legend()
     plt.grid(alpha=0.3)
-    plt.show()
+    show_and_save(save_path)
 
 
-def plot_image(df, class_names, total_images=8, subplot_size=(2, 8), prediction_distribution=None, figsize=(24, 6)):
+def plot_image(df, class_names, total_images=8, subplot_size=(2, 8), prediction_distribution=None, figsize=(24, 6), save_path=None):
     """Display each image with its true class, followed by its prediction distribution if provided."""
     num_classes = len(class_names)
     plt.figure(figsize=figsize)
@@ -129,10 +137,10 @@ def plot_image(df, class_names, total_images=8, subplot_size=(2, 8), prediction_
 
     plt.suptitle("Predicted Images and Probability Distributions", fontsize=16)
     plt.tight_layout()
-    plt.show()
+    show_and_save(save_path)
 
 
-def plot_confusion(labels, predictions, class_names, model_name):
+def plot_confusion(labels, predictions, class_names, model_name, save_path=None):
     """Print and plot raw counts with true classes on rows."""
     matrix = confusion_matrix(np.argmax(labels, axis=1), np.argmax(predictions, axis=1))
 
@@ -143,7 +151,7 @@ def plot_confusion(labels, predictions, class_names, model_name):
     plt.setp(ax.get_yticklabels(), rotation=0)
     print(f"\n{model_name} Confusion Matrix:\n", matrix)
     plt.tight_layout()
-    plt.show()
+    show_and_save(save_path)
 
 
 # ============================================================
@@ -200,11 +208,14 @@ class ModelTrainer:
         val_loss = self.history.history["val_loss"]
         best     = int(np.argmin(val_loss))
         score    = self.model.evaluate(self.x_test, self.y_test, verbose=0, return_dict=True)
+        prefix   = os.path.join(self.results_dir, self.model_name.lower().replace(" ", "_"))     # plots saved as PNG here
 
         # Training curves: accuracy if tracked, always loss
         if "accuracy" in self.history.history:
-            plot_training_history(self.history, "accuracy", f"{self.model_name} Training vs Validation Accuracy")
-        plot_training_history(self.history, "loss", f"{self.model_name} Training vs Validation Loss")
+            plot_training_history(self.history, "accuracy", f"{self.model_name} Training vs Validation Accuracy",
+                                  save_path=f"{prefix}_train_val_accuracy.png")
+        plot_training_history(self.history, "loss", f"{self.model_name} Training vs Validation Loss",
+                              save_path=f"{prefix}_train_val_loss.png")
 
         print(f"\n{self.model_name} trained {len(val_loss)} epochs, best epoch {best + 1} (val loss {val_loss[best]:.4f})",
               *[f"test {k}: {v:.2%}" if k == "accuracy" else f"test {k}: {v:.4f}" for k, v in score.items()], sep=" | ")
@@ -213,12 +224,14 @@ class ModelTrainer:
         predictions = self.model.predict(self.x_test, verbose=0)
         if self.class_names is not None:
             self.save_predictions(predictions)
-            plot_confusion(self.y_test, predictions, self.class_names, self.model_name)
+            plot_confusion(self.y_test, predictions, self.class_names, self.model_name,
+                           save_path=f"{prefix}_confusion_matrix.png")
             print(f"\n{self.model_name} Classification Report:")
             print(classification_report(np.argmax(self.y_test, axis=1), np.argmax(predictions, axis=1),target_names=self.class_names, digits=3))
 
             samples = np.linspace(0, len(self.x_test) - 1, 8).astype(int)            
-            plot_image({"images": self.display_images[samples], "labels": self.y_test[samples]}, self.class_names, prediction_distribution=predictions[samples])
+            plot_image({"images": self.display_images[samples], "labels": self.y_test[samples]}, self.class_names, prediction_distribution=predictions[samples],
+                       save_path=f"{prefix}_sample_predictions.png")
         return score, predictions
 
     def save_predictions(self, predictions):
