@@ -4,6 +4,7 @@ Created on Thu Nov  5 21:31:24 2026
 @author: Haripriya Gounalan
 Common helpers for every model in the project: supervised, unsupervised and state-of-the-art (pretrained)."""
 
+import gc
 import os
 os.environ.setdefault("KERAS_BACKEND", "torch")         # Keras on PyTorch (TensorFlow has no GPU support on native Windows)
 
@@ -12,7 +13,9 @@ import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
 import seaborn as sns
+import torch
 from sklearn.metrics import classification_report, confusion_matrix
+from sklearn.utils.class_weight import compute_class_weight
 
 # ============================================================
 # Default Training Configuration
@@ -20,6 +23,28 @@ from sklearn.metrics import classification_report, confusion_matrix
 batch_size = 32
 no_epochs  = 30
 patience   = 5  # Early stopping
+
+
+# ============================================================
+# Class Weights (handle class imbalance)
+# ============================================================
+def balanced_class_weights(y_onehot):
+    """weight = total / (classes x class count): mistakes on smaller classes count more in the loss."""
+    labels  = np.argmax(y_onehot, axis=1)
+    present = np.unique(labels)
+    weights = compute_class_weight("balanced", classes=present, y=labels)
+    return {int(c): float(w) for c, w in zip(present, weights)}
+
+
+# ============================================================
+# Free GPU Memory Between Models
+# ============================================================
+def free_gpu_memory():
+    """Remove old models from GPU memory (prevents CUDA out of memory when training several models in one run)."""
+    keras.backend.clear_session()
+    gc.collect()
+    if torch.cuda.is_available():
+        torch.cuda.empty_cache()
 
 
 # ============================================================
@@ -133,7 +158,7 @@ class ModelTrainer:
     def __init__(self, model, model_name, x_train, y_train, x_val, y_val, x_test, y_test, class_names=None,
                  optimizer="adam", loss_function="categorical_crossentropy", metrics=("accuracy",),
                  batch_size=batch_size, no_epochs=no_epochs, patience=patience, verbosity=2, display_images=None,
-                 results_dir="results"):
+                 results_dir="results", class_weight=None):
         self.model          = model
         self.model_name     = model_name
         self.x_train, self.y_train = x_train, y_train
@@ -149,6 +174,7 @@ class ModelTrainer:
         self.verbosity      = verbosity
         self.display_images = x_test if display_images is None else display_images     # Images shown in plots
         self.results_dir    = results_dir                                              # Where the best model is saved
+        self.class_weight   = balanced_class_weights(y_train) if class_weight == "balanced" else class_weight  # None = equal weights
         self.history        = None
 
     def train(self):
@@ -163,7 +189,7 @@ class ModelTrainer:
             keras.callbacks.ModelCheckpoint(checkpoint_path, monitor="val_loss", save_best_only=True)]
 
         self.history = self.model.fit(self.x_train, self.y_train, validation_data=(self.x_val, self.y_val),
-                                      epochs=self.no_epochs, batch_size=self.batch_size,
+                                      epochs=self.no_epochs, batch_size=self.batch_size, class_weight=self.class_weight,
                                       callbacks=callbacks, verbose=self.verbosity)
         
         self.model = keras.models.load_model(checkpoint_path)                          # Best epoch, saved to disk
