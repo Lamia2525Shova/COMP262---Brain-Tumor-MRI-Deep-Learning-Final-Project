@@ -6,6 +6,17 @@ Created on Wed Nov  4 10:40:02 2026
 """
 
 import os
+import sys
+
+# Project setup: find the project root, make the shared folders importable and run from the root,
+# so "./data" works from any folder (also on Kaggle, where all files are in one folder); results are saved next to each script
+_here = os.path.dirname(os.path.abspath(__file__))
+PROJECT_ROOT = _here if os.path.exists(os.path.join(_here, "model_utils.py")) else os.path.dirname(_here)
+sys.path[:0] = [os.path.join(PROJECT_ROOT, d) for d in ("01_data_exploration_preprocessing", "utils")]
+os.chdir(PROJECT_ROOT)
+
+import hashlib
+
 import cv2
 import matplotlib.pyplot as plt
 import numpy as np
@@ -75,6 +86,18 @@ def inspect_raw_images(dataset_path):
             with Image.open(os.path.join(dataset_path, folder, filename)) as im:        # Header only, no pixel decode
                 records.append({"class": folder, "size": f"{im.width} x {im.height}",
                                 "square": im.width == im.height, "mode": im.mode})
+    return pd.DataFrame(records)
+
+
+def file_fingerprints(dataset_paths):
+    """MD5 fingerprint of every file: identical fingerprints = byte-for-byte identical (duplicate) images."""
+    records = []
+    for split, dataset_path in dataset_paths.items():
+        for folder in classes:
+            for filename in sorted(os.listdir(os.path.join(dataset_path, folder))):
+                with open(os.path.join(dataset_path, folder, filename), "rb") as file:
+                    records.append({"split": split, "class": folder, "file": filename,
+                                    "md5": hashlib.md5(file.read()).hexdigest()})
     return pd.DataFrame(records)
 
 
@@ -166,6 +189,29 @@ if __name__ == "__main__":
 
     show("Images with R = G = B (no real color) per class", pd.DataFrame(
         {split: [f"{gray[split][y[split] == c].mean():.1%}" for c in range(len(classes))] for split in gray}, index=classes))
+
+    # ============================================================
+    # Step 1.d: Duplicate Images (byte-for-byte identical files)
+    # ============================================================
+    section("Step 1.d: Duplicate images")
+
+    files = file_fingerprints({"Training": training_folder_path, "Testing": testing_folder_path})
+    dups  = files[files.duplicated("md5", keep=False)]                          # every copy of a repeated image
+
+    show("Duplicates per split", pd.DataFrame({split: {
+        "Files": (files["split"] == split).sum(),
+        "Duplicate groups": dups.loc[dups["split"] == split, "md5"].nunique(),
+        "Extra copies": dups[dups["split"] == split].duplicated("md5").sum()}  # copies beyond the first
+        for split in ["Training", "Testing"]}))
+
+    per_group = dups.groupby("md5").agg(splits=("split", "nunique"), labels=("class", "nunique"))
+    show("Duplicate checks", pd.DataFrame({"Groups": {
+        "Shared between Training and Testing (leakage)": (per_group["splits"] > 1).sum(),
+        "Copies with different labels (label conflict)": (per_group["labels"] > 1).sum()}}))
+
+    show("Extra copies per class", pd.DataFrame({split: dups[dups["split"] == split]
+        .loc[lambda d: d.duplicated("md5"), "class"].value_counts().reindex(classes, fill_value=0)
+        for split in ["Training", "Testing"]}))
 
     # Plot class distribution
     plot_class_distribution("Training", y_train, classes)
