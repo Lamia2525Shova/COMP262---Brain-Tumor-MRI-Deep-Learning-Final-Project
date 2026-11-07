@@ -7,7 +7,12 @@ Created on Wed Nov  4 15:09:36 2026
 This script implements the preprocessing steps for the MRI dataset, including color mode normalization, cropping black margins, 
 resizing images, normalizing pixel values, and one-hot encoding labels. It also provides visualization of the preprocessing results.
 """
+import os
+import sys
+os.environ.setdefault("KERAS_BACKEND", "torch")
+os.environ.setdefault("TF_CPP_MIN_LOG_LEVEL", "1")
 
+import hashlib
 import os
 import cv2
 import matplotlib.patches as patches
@@ -16,7 +21,7 @@ import numpy as np
 import pandas as pd
 from keras.utils import to_categorical
 
-from data_exploration import classes, section, show, testing_folder_path, training_folder_path
+from data_exploration import classes, plot_class_distribution, section, show, testing_folder_path, training_folder_path
 
 # ============================================================
 # Configuration
@@ -45,21 +50,34 @@ def crop_img(img):
     return img[y:y + h, x:x + w] if w and h else img
 
 
-def preprocess_dataset(dataset_path, crop=True):
-    """Read every image and apply steps 1-4; returns (images, labels) as uint8 / int arrays."""
-    images, labels = [], []
+def preprocess_dataset(dataset_path, crop=True, size=image_size, remove_duplicates=True):
+    """Read every image and apply steps 1-4; returns (images, labels) as uint8 / int arrays.
+    size: output size (default 128x128; ResNet50 uses 224x224, its original ImageNet size).
+    remove_duplicates: keep only the first copy of byte-for-byte identical files (Training and Testing)."""
+    images, labels, seen, removed = [], [], set(), 0
 
     for label, folder in enumerate(classes):
         for filename in sorted(os.listdir(os.path.join(dataset_path, folder))):
-            img = cv2.imread(os.path.join(dataset_path, folder, filename))              # 1. Any color mode -> 3-channel BGR
+            path = os.path.join(dataset_path, folder, filename)
+            if remove_duplicates:
+                with open(path, "rb") as file:
+                    md5 = hashlib.md5(file.read()).hexdigest()                          # same fingerprint = same image
+                if md5 in seen:
+                    removed += 1
+                    continue
+                seen.add(md5)
+
+            img = cv2.imread(path)                                                      # 1. Any color mode -> 3-channel BGR
             if img is None:
                 continue
 
             img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)                                  # 2. BGR -> RGB
             img = crop_img(img) if crop else img                                        # 3. Remove black margins
-            images.append(cv2.resize(img, image_size, interpolation=cv2.INTER_AREA))    # 4. Resize to image_size
+            images.append(cv2.resize(img, size, interpolation=cv2.INTER_AREA))          # 4. Resize to size
             labels.append(label)
 
+    if remove_duplicates:
+        print(f"    Duplicates removed from {dataset_path}: {removed}")
     return np.asarray(images, dtype=np.uint8), np.asarray(labels, dtype=np.int64)
 
 
@@ -117,7 +135,15 @@ if __name__ == "__main__":
     x_train, y_train = preprocess_dataset(training_folder_path)
     x_test,  y_test  = preprocess_dataset(testing_folder_path)
 
-    # Before vs after (uses the uint8 images, before normalization)
+    show("Class distribution after removing duplicates (Training and Testing)", pd.DataFrame(
+        {"Training": np.bincount(y_train), "Testing": np.bincount(y_test)}, index=classes)
+        .pipe(lambda df: pd.concat([df, df.sum().to_frame("Total").T])))
+
+    # plot class distribution after removing duplicates (Training and Testing)
+    plot_class_distribution("Training", y_train, classes)
+    plot_class_distribution("Testing",  y_test,  classes)
+
+    # plot before vs after (uses the uint8 images, before normalization)
     first = [np.flatnonzero(y_train == i)[0] for i in range(len(classes))]             # First image of each class
     plot_before_after(training_folder_path, x_train[first])
 
