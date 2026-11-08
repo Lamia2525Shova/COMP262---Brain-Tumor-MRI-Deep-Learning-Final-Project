@@ -13,3 +13,5 @@ __pycache__/
 
 # Trained models (10-285 MB; GitHub rejects files over 100 MB). Run the scripts to recreate them
 *.keras
+# except the tuned CNN (9 MB; recreating it needs the 4-hour Hyperband search)
+!02_supervised learning/results/cnn_tuning/tuned_cnn_best.keras
