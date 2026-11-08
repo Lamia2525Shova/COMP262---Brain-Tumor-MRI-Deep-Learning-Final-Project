@@ -1,0 +1,4 @@
+Trial ID,Status,Val_Loss,Val_Accuracy,Initial_Epoch,Epoch_Budget,architecture,conv_blocks,filters_0,kernel_0,conv_dropout_0,filters_1,kernel_1,conv_dropout_1,filters_2,kernel_2,conv_dropout_2,filters_3,kernel_3,conv_dropout_3,dense_units_0,dense_dropout_0,optimizer,learning_rate,filters_4,kernel_4,conv_dropout_4,filters_5,kernel_5,conv_dropout_5
+0088,COMPLETED,0.12794792652130127,0.9576427340507507,0,30,standard,6,32,3,0.1,256,3,0.1,256,5,0.1,128,3,0.2,256,0.30000000000000004,adam,0.001,64.0,5.0,0.2,128.0,3.0,0.0
+0083,COMPLETED,0.14720642566680908,0.9567219018936157,10,30,batch_norm,6,32,3,0.2,128,3,0.2,64,5,0.1,128,5,0.0,256,0.4,adam,0.0005,64.0,5.0,0.1,256.0,3.0,0.1
+0087,COMPLETED,0.35740092396736145,0.8756905794143677,0,30,double_conv,4,32,3,0.2,256,3,0.0,64,3,0.0,128,3,0.2,256,0.4,rmsprop,0.0005,,,,,,
