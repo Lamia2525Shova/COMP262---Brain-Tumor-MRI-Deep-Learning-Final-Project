@@ -1,0 +1,19 @@
+# Dataset (download from Kaggle: masoudnickparvar/brain-tumor-mri-dataset)
+data/
+
+# Python cache and editor settings
+__pycache__/
+.vscode/
+
+# Kaggle upload bundle
+*.zip
+
+# KerasTuner trial folders (recreated by cnn_tuning.py)
+**/hyperband*/
+
+# Trained models (10-285 MB; GitHub rejects files over 100 MB). Run the scripts to recreate them
+*.keras
+# except the tuned CNN (9 MB; recreating it needs the 4-hour Hyperband search)
+!02_supervised learning/results/cnn_tuning/tuned_cnn_best.keras
+# and the autoencoder models (4 MB and 640 KB)
+!03_unsupervised_learning/results/autoencoder/*.keras
