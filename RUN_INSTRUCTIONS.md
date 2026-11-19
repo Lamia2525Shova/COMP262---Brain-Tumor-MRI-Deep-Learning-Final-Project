@@ -22,9 +22,10 @@
 | 2 | `01_data_exploration_preprocessing/preprocessing.py` | `01_.../results/preprocessing/` | Crop, resize, duplicate removal |
 | 3 | `02_supervised learning/simple_cnn.py` | `02_.../results/simple_cnn/` | Baseline CNN: **run before cnn_tuning** (it is the comparison baseline) |
 | 4 | `02_supervised learning/cnn_tuning.py` | `02_.../results/cnn_tuning/` | Hyperband search + retrain (several hours locally) |
-| 5 | `04_pretrained_model_finetuning/model_screening.py` | `04_.../results/model_screening/` | Compares 4 ImageNet models |
-| 6 | `04_pretrained_model_finetuning/pretrained_resnet50_128.py` | `04_.../results/pretrained_resnet50_128/` | Frozen, fine-tuned and from-scratch ResNet50 |
-| 7 | `04_pretrained_model_finetuning/pretrained_resnet50_224.py` | `04_.../results/pretrained_resnet50_224/` | Same at 224x224 (best run on Kaggle) |
+| 5 | `03_unsupervised_learning/autoencoder.py` | `03_.../results/autoencoder/` | Unsupervised CAE pretraining + transfer learning classifier |
+| 6 | `04_pretrained_model_finetuning/model_screening.py` | `04_.../results/model_screening/` | Compares 4 ImageNet models |
+| 7 | `04_pretrained_model_finetuning/pretrained_resnet50_128.py` | `04_.../results/pretrained_resnet50_128/` | Frozen, fine-tuned and from-scratch ResNet50 |
+| 8 | `04_pretrained_model_finetuning/pretrained_resnet50_224.py` | `04_.../results/pretrained_resnet50_224/` | Same at 224x224 (best run on Kaggle) |
 
 Steps 1 and 2 are optional: every model script loads and preprocesses the data itself.
 Steps 5 to 7 download ImageNet weights, so they need an internet connection.
@@ -38,6 +39,7 @@ python "01_data_exploration_preprocessing/data_exploration.py"
 python "01_data_exploration_preprocessing/preprocessing.py"
 python "02_supervised learning/simple_cnn.py"
 python "02_supervised learning/cnn_tuning.py"
+python "03_unsupervised_learning/autoencoder.py"
 python "04_pretrained_model_finetuning/model_screening.py"
 python "04_pretrained_model_finetuning/pretrained_resnet50_128.py"
 python "04_pretrained_model_finetuning/pretrained_resnet50_224.py"
