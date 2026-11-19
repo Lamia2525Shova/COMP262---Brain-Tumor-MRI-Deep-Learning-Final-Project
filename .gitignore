@@ -8,8 +8,9 @@ __pycache__/
 # Kaggle upload bundle
 *.zip
 
-# KerasTuner trial folders (recreated by cnn_tuning.py)
+# KerasTuner trial folders: one checkpoint per trial, several GB in total (recreated by the tuning scripts)
 **/hyperband*/
+**/random_search*/
 
 # Trained models (10-285 MB; GitHub rejects files over 100 MB). Run the scripts to recreate them
 *.keras
