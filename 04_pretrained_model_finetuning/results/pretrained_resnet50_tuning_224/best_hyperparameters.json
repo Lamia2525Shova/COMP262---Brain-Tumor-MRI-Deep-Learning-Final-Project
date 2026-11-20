@@ -1,0 +1,7 @@
+{
+  "learning_rate": 5e-05,
+  "unfreeze": "conv4+conv5",
+  "dropout": 0.3,
+  "optimizer": "adamw",
+  "batch_size": 8
+}
