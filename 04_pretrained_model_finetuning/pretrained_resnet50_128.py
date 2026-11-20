@@ -89,12 +89,17 @@ def freeze_base(model):
     model.get_layer("resnet50").trainable = False
 
 
-def unfreeze_last_block(model):
-    """Stage 2: unfreeze only the last ResNet50 block (conv5_x); earlier blocks stay frozen."""
+def unfreeze_blocks(model, prefixes):
+    """Unfreeze the ResNet50 layers whose name starts with prefixes (e.g. "conv5_"); the others stay frozen."""
     base = model.get_layer("resnet50")
     base.trainable = True
     for layer in base.layers:
-        layer.trainable = layer.name.startswith(fine_tune_from)
+        layer.trainable = layer.name.startswith(prefixes)
+
+
+def unfreeze_last_block(model):
+    """Stage 2: unfreeze only the last ResNet50 block (conv5_x); earlier blocks stay frozen."""
+    unfreeze_blocks(model, fine_tune_from)
 
 
 def count_trainable(model):
@@ -176,14 +181,10 @@ def plot_resnet_comparison(model_names, histories, scores, save_path, title):
 
 
 # ============================================================
-# Run the Full Experiment at One Image Size
+# Load, Scale and Split the Data (shared with the ResNet50 tuning scripts)
 # ============================================================
-def run_experiment(image_size=(128, 128), batch_size=batch_size):
-    """Steps 1-6 at the given image size; results go to results/pretrained_resnet50_<size>/.
-    batch_size: smaller for large images, so training fits in GPU memory."""
-    results_dir = os.path.join(_here, "results", f"pretrained_resnet50_{image_size[0]}")
-    os.makedirs(results_dir, exist_ok=True)
-
+def load_data(image_size):
+    """Steps 1-2: returns (x_train, y_train, x_val, y_val, x_test, y_test) and the original test images (for plots)."""
     # ============================================================
     # Step 1: Load and Preprocess Data
     # ============================================================
@@ -213,7 +214,19 @@ def run_experiment(image_size=(128, 128), batch_size=batch_size):
         "Labels shape": [y_train.shape[1:], y_val.shape[1:], y_test.shape[1:]]},
         index=["Training", "Validation", "Testing"]))
 
-    data = (x_train, y_train, x_val, y_val, x_test, y_test)
+    return (x_train, y_train, x_val, y_val, x_test, y_test), test_images
+
+
+# ============================================================
+# Run the Full Experiment at One Image Size
+# ============================================================
+def run_experiment(image_size=(128, 128), batch_size=batch_size):
+    """Steps 1-6 at the given image size; results go to results/pretrained_resnet50_<size>/.
+    batch_size: smaller for large images, so training fits in GPU memory."""
+    results_dir = os.path.join(_here, "results", f"pretrained_resnet50_{image_size[0]}")
+    os.makedirs(results_dir, exist_ok=True)
+
+    data, test_images = load_data(image_size)
 
     # ============================================================
     # Step 3: Stage 1 - Feature Extraction (ResNet50 frozen)
