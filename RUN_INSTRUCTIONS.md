@@ -22,6 +22,7 @@
 | 2 | `01_data_exploration_preprocessing/preprocessing.py` | `01_.../results/preprocessing/` | Crop, resize, duplicate removal |
 | 3 | `02_supervised learning/simple_cnn.py` | `02_.../results/simple_cnn/` | Baseline CNN: **run before cnn_tuning** (it is the comparison baseline) |
 | 4 | `02_supervised learning/cnn_tuning.py` | `02_.../results/cnn_tuning/` | Hyperband search + retrain (several hours locally) |
+| 4b | `02_supervised learning/svm.py` | `02_.../results/svm/` | Feature extraction + SVM tuning (CPU only, about 70 minutes); compared with the saved CNN predictions of steps 3 and 4 |
 | 5 | `04_pretrained_model_finetuning/model_screening.py` | `04_.../results/model_screening/` | Compares 4 ImageNet models |
 | 6 | `04_pretrained_model_finetuning/pretrained_resnet50_128.py` | `04_.../results/pretrained_resnet50_128/` | Frozen, fine-tuned and from-scratch ResNet50 |
 | 7 | `04_pretrained_model_finetuning/pretrained_resnet50_224.py` | `04_.../results/pretrained_resnet50_224/` | Same at 224x224 (best run on Kaggle) |
@@ -38,6 +39,7 @@ python "01_data_exploration_preprocessing/data_exploration.py"
 python "01_data_exploration_preprocessing/preprocessing.py"
 python "02_supervised learning/simple_cnn.py"
 python "02_supervised learning/cnn_tuning.py"
+python "02_supervised learning/svm.py"
 python "04_pretrained_model_finetuning/model_screening.py"
 python "04_pretrained_model_finetuning/pretrained_resnet50_128.py"
 python "04_pretrained_model_finetuning/pretrained_resnet50_224.py"
@@ -60,6 +62,7 @@ python -u "01_data_exploration_preprocessing/data_exploration.py" 2>&1 | Tee-Obj
 python -u "01_data_exploration_preprocessing/preprocessing.py" 2>&1 | Tee-Object "01_data_exploration_preprocessing/results/preprocessing/preprocessing_log.txt"
 python -u "02_supervised learning/simple_cnn.py" 2>&1 | Tee-Object "02_supervised learning/results/simple_cnn/simple_cnn_log.txt"
 python -u "02_supervised learning/cnn_tuning.py" 2>&1 | Tee-Object "02_supervised learning/results/cnn_tuning/cnn_tuning_log.txt"
+python -u "02_supervised learning/svm.py" 2>&1 | Tee-Object "02_supervised learning/results/svm/svm_log.txt"
 python -u "04_pretrained_model_finetuning/model_screening.py" 2>&1 | Tee-Object "04_pretrained_model_finetuning/results/model_screening/model_screening_log.txt"
 python -u "04_pretrained_model_finetuning/pretrained_resnet50_128.py" 2>&1 | Tee-Object "04_pretrained_model_finetuning/results/pretrained_resnet50_128/resnet50_128_log.txt"
 python -u "04_pretrained_model_finetuning/pretrained_resnet50_224.py" 2>&1 | Tee-Object "04_pretrained_model_finetuning/results/pretrained_resnet50_224/resnet50_224_log.txt"

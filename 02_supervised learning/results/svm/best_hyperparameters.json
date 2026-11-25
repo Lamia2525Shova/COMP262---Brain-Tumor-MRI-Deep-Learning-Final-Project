@@ -1,0 +1,11 @@
+{
+  "method": "combined",
+  "scaler": "none",
+  "pca": false,
+  "flip": true,
+  "svm": {
+    "kernel": "rbf",
+    "C": 100.0,
+    "gamma": 0.04814612865447998
+  }
+}
