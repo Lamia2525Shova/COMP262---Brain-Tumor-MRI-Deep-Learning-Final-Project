@@ -1,0 +1,2 @@
+Model,Accuracy,Precision,Recall,Macro F1,Trainable Parameters,Epochs Run,Best Epoch,Training Time (min),Best Validation Accuracy,Best Validation Loss,BatchNormalization
+EfficientNetB0_Scratch_Frozen_BN,0.8737373737373737,0.8758169323709127,0.872241290650142,0.869477120750244,3970656,30,29,18.41611106333342,0.9134438037872314,0.2497759461402893,Frozen

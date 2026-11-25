@@ -1,0 +1,2 @@
+Model,Initialization,BatchNormalization,Trainable Parameters,BatchNormalization Layers,Trainable Convolution Layers,Image Size,Batch Size,Learning Rate,Maximum Epochs,Epochs Run,Best Epoch,Best Validation Accuracy,Best Validation Loss,Training Time (min),All BN Statistics Unchanged,Convolution Weights Changed
+EfficientNetB0_Scratch_Frozen_BN,Random (weights=None),Frozen,3970656,49,81,128x128,32,0.001,30,30,29,0.9134438037872314,0.2497759461402893,18.41611106333342,True,True

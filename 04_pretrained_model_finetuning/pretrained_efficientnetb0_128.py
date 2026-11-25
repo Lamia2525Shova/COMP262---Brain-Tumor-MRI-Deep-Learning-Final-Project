@@ -312,6 +312,19 @@ def train_model(
         verbose=2
     )
 
+    # Save epoch-by-epoch training history
+    history_df = pd.DataFrame(history.history)
+    history_df.insert(0, "epoch", range(1, len(history_df) + 1))
+
+    history_path = os.path.join(
+        results_dir,
+        f"{model_name.lower()}_training_history.csv"
+    )
+
+    history_df.to_csv(history_path, index=False)
+
+    print(f"Training history saved: {history_path}")
+
     training_time = (time.perf_counter() - start_time) / 60
 
     # Load the checkpoint selected using validation loss.
