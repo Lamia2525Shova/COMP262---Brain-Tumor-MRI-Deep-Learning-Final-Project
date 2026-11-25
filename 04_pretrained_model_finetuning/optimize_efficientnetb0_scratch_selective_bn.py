@@ -1,5 +1,7 @@
 
 """
+@author: Abdallah Divkar
+
 EfficientNetB0 from scratch with selectively frozen BatchNormalization layers.
 
 Purpose:

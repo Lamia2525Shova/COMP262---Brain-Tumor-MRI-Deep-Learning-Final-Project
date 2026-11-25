@@ -1,6 +1,8 @@
 
 # -*- coding: utf-8 -*-
 """
+@author: Abdallah Divkar
+
 DenseNet121 experiments for Brain Tumor MRI Classification.
 
 Experiments:

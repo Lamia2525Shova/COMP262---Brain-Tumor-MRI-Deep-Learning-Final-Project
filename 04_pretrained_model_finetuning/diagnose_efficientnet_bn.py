@@ -1,6 +1,8 @@
 
 # -*- coding: utf-8 -*-
 """
+@author: Abdallah Divkar
+
 EfficientNetB0 Batch Normalization diagnostic.
 
 Purpose:

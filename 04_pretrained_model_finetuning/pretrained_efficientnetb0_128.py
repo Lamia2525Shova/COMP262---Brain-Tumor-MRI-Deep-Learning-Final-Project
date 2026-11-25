@@ -2,9 +2,8 @@
 """
 Created on Wed Nov 18 10:12:45 2026
 
-@author: Abdallah Divker
-"""
-"""
+@author: Abdallah Divkar
+
 EfficientNetB0 experiments for Brain Tumor MRI Classification.
 
 Experiments:

@@ -1,6 +1,7 @@
 
 # -*- coding: utf-8 -*-
 """
+@author: Abdallah Divkar
 Baseline comparison and class-level analysis
 COMP263 - Brain Tumor MRI Classification
 

@@ -1,0 +1,5 @@
+configuration,bn_configuration,learning_rate_strategy,epochs_run,best_val_accuracy,best_val_accuracy_epoch,best_val_loss,best_val_loss_epoch,test_accuracy,test_macro_precision,test_macro_recall,test_macro_f1,training_time_minutes,test_evaluated,checkpoint_selection
+Original Scratch,All 49 trainable,"Adam, fixed 0.001",30,0.9641,28,0.1181,28,0.925505,0.929585,0.924378,0.923787,24.76,True,Original baseline checkpoint
+Frozen BN,All 49 frozen,"Adam, fixed 0.001",30,0.913444,26,0.249776,29,0.873737,0.875817,0.872241,0.869477,18.416,True,Best validation-loss checkpoint
+Selective BN,4 selected frozen; 45 trainable,"Adam, fixed 0.001",22,0.918969,17,0.261883,17,,,,,18.43,False,Validation diagnostic only; no test evaluation
+ReduceLROnPlateau,All 49 trainable,ReduceLROnPlateau,30,0.959484,29,0.141863,25,0.9078,0.9131,0.9065,0.9054,23.05,True,Best validation-loss checkpoint (epoch 25)
