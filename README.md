@@ -78,3 +78,22 @@ test results are on the 1,584 test images.
 | Supervised | Tuned CNN | 95.14% | 95.76% | 91.22% | 90.94% |
 | Unsupervised | To be added | | | | |
 | SOTA | ResNet50, fine-tuned and tuned (224x224) | 99.75% | 98.99% | **95.96%** | 95.86% |
+
+## Best Models
+
+| Model | Saved file | Script that creates it | Time (GPU) |
+|---|---|---|---|
+| Tuned CNN | `02_supervised learning/results/cnn_tuning/tuned_cnn_best.keras` (in git) | `02_supervised learning/cnn_tuning.py` | ~4 h |
+| ResNet50, fine-tuned and tuned (224x224) | `04_pretrained_model_finetuning/results/pretrained_resnet50_tuning_224/resnet50_tuned_best.keras` (not in git, 95 MB) | `04_pretrained_model_finetuning/pretrained_resnet50_tuning_224.py` | ~7.5 h |
+
+What the scripts need:
+- `pretrained_resnet50_tuning_224.py` also needs `pretrained_resnet50_tuning_128.py` and `pretrained_resnet50_128.py` (same folder).
+- Every script needs `01_data_exploration_preprocessing/data_exploration.py` (seed, class names, data paths),
+  `01_data_exploration_preprocessing/preprocessing.py` (cropping, resizing, duplicate removal),
+  `utils/model_utils.py` and the dataset in `data/`.
+- The ResNet50 script needs an internet connection for the ImageNet weights.
+
+To use a saved model, prepare images the same way as in training:
+- Tuned CNN: 128x128, pixels divided by 255.
+- ResNet50: 224x224, `keras.applications.resnet50.preprocess_input`.
+- Output classes, in order: `glioma`, `meningioma`, `notumor`, `pituitary`.
